@@ -2,7 +2,9 @@
 title: "EDA_titanic"
 author: "Stefany de Oliveira Fernandes"
 date: "2023-03-07"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 # Análise Exploratória de Dados (EDA) - Titanic
@@ -70,6 +72,7 @@ Primeiro será necessário excluir 4 colunas que não serão úteis:
 Após, será necessário excluir todas as linhas que possuem, pelo menos, um valor nulo ou NA.
 
 ```{r}
+setwd("C:\\titanic")
 df_titanic <- df_titanic[complete.cases(df_titanic), ]
 View(df_titanic)
 ```
@@ -81,10 +84,10 @@ View(df_titanic)
 ![Figura 2 - Gráfico de sobreviventes de cada sexo](images/sex_GRAPHIC.png)
 
 ```{r}
-ggplot(data = df_titanic, aes(x=Sex, y=Survived, fill=Sex)) +
-  geom_col() +
-  labs(x="Sexo", y = "Sobreviventes", title="Quantas mulheres e homes sobreviveram?") +
-  scale_fill_manual(values=c("pink","light blue"))
+  ggplot(data = df_titanic, aes(x=Sex, y=Survived, fill=Sex)) +
+    geom_col() +
+    labs(x="Sexo", y = "Sobreviventes", title="Quantas mulheres e homes sobreviveram?") +
+    scale_fill_manual(values=c("pink","light blue"))
 ```
 
 #### Qual a proporção de cada gênero?
@@ -147,3 +150,56 @@ ggplot(df_class, aes(x = Class, y = Proportion, fill = Class)) +
 2.  **Proximidade dos barcos salva-vidas:** As cabines dos passageiros da primeira classe estavam em uma localização mais próxima dos bote salva-vidas.
 
 3.  **Normal sociais:** Além das crianças e das mulheres terem prioridades em serem salvas. É importante ressaltar que pessoas mais influentes eram priorizadas na hora dos salvamentos.
+
+    ## Qual era a idade dos passageiros que estavam no Titanic?![Figura 6 - Idade dos passageiros do Titanic](images/histogram_age-03)
+
+```{r}
+ggplot(data = df_titanic, aes(x = Age)) +
+  geom_histogram(fill = "gray", color = "black") +
+  labs(title = "Idade dos passageiros do Titanic", x = "Idade", y = "Quantidade")
+```
+
+É possível observar que a grande parte das pessoas que estavam no Titanic eram de 20 até 38 anos e tinham poucas pessoas com mais de 50 anos.
+
+![Figura 8 - Quantidade de pessoas que sobreviveram por faixa etária](images/histogram_survived)
+
+```{r}
+df_survived <- subset(df_titanic, Survived == 1)
+
+ggplot(data = df_survived, aes(x = age_group)) +
+  geom_bar(fill = "light green", color = "black") +
+  labs(title = "Faixa etária das pessoas que sobreviveram", 
+       x = "Idade", y = "Quantidade") 
+```
+
+É perceptível que a faixa etária predominante (20-35 anos) foi a que mais sobreviveu. Assim como grande parte das crianças de 0 até 5 anos, nesse caso pode ter alguma relação com terem pais a bordo.
+
+### Quantas mulheres sobreviveram?
+
+![FIgura 9 - Mulheres sobreviventes por faixa etária](images/histogram_female)
+
+```{r}
+df_survived_female <- subset(df_titanic, Survived == 1 & Sex == "female")
+
+ggplot(data = df_survived_female, aes(x = age_group)) +
+  geom_bar(fill = "pink", color = "black") +
+  labs(title = "Faixa etária das mulheres que sobreviveram", 
+       x = "Idade", y = "Quantidade") 
+```
+
+É possível perceber que a maior parte das mulheres que sobreviveram foram as que tinham de 20 até 25 anos. Considerando o gráfico das pessoas que sobreviveram, independente do sexo, é possível perceber que praticamente todos os passageiros dessa faixa etária eram mulheres.
+
+### Quantos homens sobreviveram?
+
+![Figura 10 - Homens sobreviventes por faixa etária](images/histogram_male)
+
+```{r}
+df_survived_male <- subset(df_titanic, Survived == 1 & Sex == "male")
+
+ggplot(data = df_survived_male, aes(x = age_group)) +
+  geom_bar(fill = "light blue", color = "black") +
+  labs(title = "Faixa etária dos homens que sobreviveram", 
+       x = "Idade", y = "Quantidade") 
+```
+
+No caso dos homens, os homens entre 0 até 5 anos, 25 até 35 anos todos sobreviveram. Justamente a faixa etária predominante no navio. Também é possível que eles tenham relação com terem conjugês a bordo.

@@ -1,11 +1,12 @@
 #bibliotecas
 install.package("corrplot")
-library(corrplot)
 install.packages("ggplot2")
-library(ggplot2)
 install.packages("tidyverse")
-library(tidyverse)
 install.packages("dplyr")
+
+library(corrplot)
+library(ggplot2)
+library(tidyverse)
 library(dplyr)
 
 setwd("C:\\titanic")
@@ -62,3 +63,35 @@ ggplot(df_class, aes(x = Class, y = Proportion, fill = Class)) +
   labs(title = "Proporção das classes sociais no Titanic",
        x = "Classe social", y = "Porcentagem") +
   scale_fill_manual(values=c("#152940", "#336a98", "#92d9fa"))
+
+#Qual era a idade dos passageiros que estavam no navio?
+ggplot(data = df_titanic, aes(x = Age)) +
+  geom_histogram(fill = "gray", color = "black") +
+  labs(title = "Idade dos passageiros do Titanic", x = "Idade", y = "Quantidade")
+
+#Faixa etária das pessoas que sobreviveram
+df_titanic$age_group = cut(df_titanic$Age, breaks = seq(round(min(df_titanic$Age)), 
+                                                        round(max(df_titanic$Age)), 5))
+
+df_survived <- subset(df_titanic, Survived == 1)
+
+ggplot(data = df_survived, aes(x = age_group)) +
+  geom_bar(fill = "light green", color = "black") +
+  labs(title = "Faixa etária das pessoas que sobreviveram", 
+       x = "Idade", y = "Quantidade") 
+
+#Quantas mulheres sobreviveram?
+df_survived_female <- subset(df_titanic, Survived == 1 & Sex == "female")
+
+ggplot(data = df_survived_female, aes(x = age_group)) +
+  geom_bar(fill = "pink", color = "black") +
+  labs(title = "Faixa etária das mulheres que sobreviveram", 
+       x = "Idade", y = "Quantidade") 
+
+#Quantos homens sobreviveram?
+df_survived_male <- subset(df_titanic, Survived == 1 & Sex == "male")
+
+ggplot(data = df_survived_male, aes(x = age_group)) +
+  geom_bar(fill = "light blue", color = "black") +
+  labs(title = "Faixa etária dos homens que sobreviveram", 
+       x = "Idade", y = "Quantidade") 
