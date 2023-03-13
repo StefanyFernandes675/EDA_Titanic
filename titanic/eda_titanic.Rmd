@@ -1,0 +1,149 @@
+---
+title: "EDA_titanic"
+author: "Stefany de Oliveira Fernandes"
+date: "2023-03-07"
+output: html_document
+---
+
+# Análise Exploratória de Dados (EDA) - Titanic
+
+## Dataset
+
+O dataset utilizado foi do Titanic retirado do Kaggle: <https://www.kaggle.com/competitions/titanic>.
+
+O conjunto de dados possue 12 variáveis:
+
+-   **PassengerId**: Código identificador de cada passageiro que estava no navio.
+
+-   **Survived**: Se o passageiro sobreviveu ou não. Se sobreviveu = 1, caso contrário = 0.
+
+-   **PClass**: Classe do ticket. 1° classe = 1, 2° classe = 2 e 3° classe = 3.
+
+-   **Name**: Nome completo do passageiro que estava no navio.
+
+-   **Sex**: Sexo biológico. Masculino = male, Feminino = female.
+
+-   **SibSp**: Número de irmãos ou conjugês no navio.
+
+-   **Parch**: Número de pais ou crianças no navio.
+
+-   **Ticket**: Número do ticket.
+
+-   **Fare**: Preço da passagem em libras esterlinas (GBP). Naquela época 1 libra esterlina equivalia a 18,5 réis e atualmente, 1 libra esterlina equivale a 6,15 reais.
+
+-   **Cabin**: Número da cabine que o passageiro estava hospedado.
+
+-   **Embarked**: Portão de embarque. C = Cherbourg, Q = Queenstown, S = Southampton
+
+-   **Age**: idade em anos inteiros.
+
+    ### Preview dos dados
+
+    ![Figura 1 - Preview dos dados](images/previewe.png){width="551" height="131"}
+
+## Preparação dos dados
+
+Primeiramente, é necessário escolher o diretório de trabalho que o dataset será encontrado.
+
+```{r}
+setwd("c:\\titanic")
+df_titanic <- read.csv("titanic.csv")
+View(df_titanic)
+```
+
+## Limpeza dos dados
+
+A segunda etapa será efetuar a limpeza dos dados.
+
+Primeiro será necessário excluir 4 colunas que não serão úteis:
+
+-   PassengerId
+
+-   Name
+
+-   Ticket
+
+-   Cabin
+
+    df_titanic \<- subset(df_titanic, select = c(-PassengerId, -Name, -Ticket, -Cabin)) View(df_titanic)
+
+Após, será necessário excluir todas as linhas que possuem, pelo menos, um valor nulo ou NA.
+
+```{r}
+df_titanic <- df_titanic[complete.cases(df_titanic), ]
+View(df_titanic)
+```
+
+## Visualização dos dados
+
+### Quantas pessoas de cada sexo sobreviveram?
+
+![Figura 2 - Gráfico de sobreviventes de cada sexo](images/sex_GRAPHIC.png)
+
+```{r}
+ggplot(data = df_titanic, aes(x=Sex, y=Survived, fill=Sex)) +
+  geom_col() +
+  labs(x="Sexo", y = "Sobreviventes", title="Quantas mulheres e homes sobreviveram?") +
+  scale_fill_manual(values=c("pink","light blue"))
+```
+
+#### Qual a proporção de cada gênero?
+
+![Figura 3 - Proporção de homens e mulheres no Titanic](images/proportion_sex_graphic-01.png)
+
+```{r}
+#Tabela de proporções de homens e mulheres
+sex_table <- round(prop.table(table(df_titanic$Sex)),2)
+
+#tabela para dataframe
+df_sex <- data.frame(Sex = rownames(sex_table), Proportion = as.numeric(sex_table))
+
+# gráfico
+ggplot(df_sex, aes(x = Sex, y = Proportion, fill = Sex)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(title = "Proporção de homens e mulheres no Titanic",
+       x = "Sexo", y = "Proporção")
+```
+
+É possível perceber que mais mulheres sobreviveram do que homens, mesmo com a quantidade de homens a bordo do navio tenha sido maior do que a de mulheres.
+
+Um dos motivos desse acontecimento é que um dos códigos de condutas da marinha muito comum naquela época era dar prioridade nos barcos salva-vidas para as mulheres e crianças.
+
+### Quantas pessoas de cada classe social sobreviveram?
+
+![Figura 4 - Quantas pessoas de cada classe social sobreviveram?](images/chart_class)
+
+```{r}
+ggplot(df_titanic, aes(x = Pclass, y = Survived, fill = Pclass)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Quantas pessoas de cada classe social sobreviveram?",
+       x = "Classe social", y = "Quantidade")
+```
+
+#### Qual a proporção de cada classe social?
+
+![Figura 5 - Qual a proporção de cada classe social que estava no Titanic](images/proportion_class_chart)
+
+```{r}
+#Proporção de pessoas em cada classe social  no dataset
+class_table <- round(prop.table(table(df_titanic$Pclass)),2)
+
+#tabela para dataframe
+df_class <- data.frame(Class = rownames(class_table), Proportion = as.numeric(class_table))
+
+# gráfico
+ggplot(df_class, aes(x = Class, y = Proportion, fill = Class)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Proporção das classes sociais no Titanic",
+       x = "Classe social", y = "Porcentagem") +
+  scale_fill_manual(values=c("#152940", "#336a98", "#92d9fa"))
+```
+
+É possível perceber que mais pessoas da classe social mais alta sobreviveram mesmo tendo menos gente a bordo do navio. Existem alguns possíveis motivos para isso:
+
+1.  **Prioridade:** As pessoas da primeira classe eram os primeiros a entrar no navio, assim como os primeiros a entrarem no bote salva-vidas.
+
+2.  **Proximidade dos barcos salva-vidas:** As cabines dos passageiros da primeira classe estavam em uma localização mais próxima dos bote salva-vidas.
+
+3.  **Normal sociais:** Além das crianças e das mulheres terem prioridades em serem salvas. É importante ressaltar que pessoas mais influentes eram priorizadas na hora dos salvamentos.
